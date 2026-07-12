@@ -5,9 +5,9 @@ spring:
   application:
     name: ms-contas
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5438/CF_contas}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/CF_contas}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:xxxx}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
