@@ -32,6 +32,9 @@ public class Conta {
     @Column(nullable = false, precision = 15, scale = 2)
     private BigDecimal saldo;
 
+    @Column(name = "usuario_id", nullable = false)
+    private String usuarioId;
+
     @Column(nullable = false)
     private Boolean ativo;
 
