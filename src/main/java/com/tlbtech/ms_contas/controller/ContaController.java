@@ -7,9 +7,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/contas")
@@ -60,5 +62,22 @@ public class ContaController {
     @GetMapping("/totais/aplicacoes")
     public ResponseEntity<BigDecimal> totalAplicacoes() {
         return ResponseEntity.ok(service.totalAplicacoes());
+    }
+
+    @GetMapping("/{id}/lancamentos")
+    public ResponseEntity<List<LancamentoBancarioResponseDTO>> listarLancamentos(@PathVariable Long id) {
+        return ResponseEntity.ok(service.listarLancamentos(id));
+    }
+
+    @PostMapping("/{id}/lancamentos")
+    public ResponseEntity<LancamentoBancarioResponseDTO> registrarLancamento(
+            @PathVariable Long id,
+            @RequestBody @Valid LancamentoBancarioRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.registrarLancamentoManual(id, dto));
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> tratarResponseStatus(ResponseStatusException ex) {
+        return ResponseEntity.status(ex.getStatusCode()).body(Map.of("message", ex.getReason()));
     }
 }

@@ -7,7 +7,7 @@ spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/CF_contas}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:xxxx}
+    password: ${SPRING_DATASOURCE_PASSWORD:0502}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -18,5 +18,8 @@ spring:
     locations: classpath:db/migration
 
 jwt:
-  secret: ${JWT_SECRET:secret}
+  secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION:86400000}
+
+internal:
+  secret: ${INTERNAL_SECRET}

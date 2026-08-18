@@ -4,10 +4,14 @@ import com.tlbtech.ms_contas.dto.TipoContaRequestDTO;
 import com.tlbtech.ms_contas.dto.TipoContaResponseDTO;
 import com.tlbtech.ms_contas.model.CategoriaTipoConta;
 import com.tlbtech.ms_contas.model.TipoConta;
+import com.tlbtech.ms_contas.model.TipoContaSeed;
+import com.tlbtech.ms_contas.repository.ContaRepository;
 import com.tlbtech.ms_contas.repository.TipoContaRepository;
+import com.tlbtech.ms_contas.repository.TipoContaSeedRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,6 +20,8 @@ import java.util.List;
 public class TipoContaService {
 
     private final TipoContaRepository repository;
+    private final ContaRepository contaRepository;
+    private final TipoContaSeedRepository seedRepository;
 
     public TipoContaResponseDTO criar(TipoContaRequestDTO dto) {
         String email = getEmailAutenticado();
@@ -83,6 +89,21 @@ public class TipoContaService {
         repository.save(tipoConta);
     }
 
+    @Transactional
+    public void excluir(Long id) {
+        String email = getEmailAutenticado();
+        TipoConta tipoConta = repository
+                .findByIdAndUsuarioIdAndAtivoFalse(id, email)
+                .orElseThrow(() -> new IllegalStateException("Tipo de conta não encontrado ou ainda ativo. Inative antes de excluir."));
+
+        if (contaRepository.existsByTipoContaIdAndAtivoTrue(id)) {
+            throw new IllegalStateException("Não é possível excluir: existem contas ativas cadastradas com este tipo.");
+        }
+
+        contaRepository.desvincularTipoContaDeContasInativas(id);
+        repository.delete(tipoConta);
+    }
+
     public TipoContaResponseDTO reativar(Long id) {
         String email = getEmailAutenticado();
         TipoConta tipoConta = repository
@@ -97,8 +118,9 @@ public class TipoContaService {
         return TipoContaResponseDTO.fromEntity(repository.save(tipoConta));
     }
 
-    private void garantirTiposPadrao(String email) {
-        if (repository.existsByUsuarioId(email)) {
+    @Transactional
+    public void garantirTiposPadrao(String email) {
+        if (seedRepository.existsById(email)) {
             return;
         }
 
@@ -113,6 +135,7 @@ public class TipoContaService {
         );
 
         repository.saveAll(padrao);
+        seedRepository.save(TipoContaSeed.builder().usuarioId(email).build());
     }
 
     private TipoConta novoTipoPadrao(String nome, CategoriaTipoConta categoria, String email) {

@@ -16,9 +16,11 @@ public interface TipoContaRepository extends JpaRepository<TipoConta, Long> {
 
     Optional<TipoConta> findByIdAndUsuarioIdAndAtivoTrue(Long id, String usuarioId);
 
+    Optional<TipoConta> findByIdAndUsuarioIdAndAtivoFalse(Long id, String usuarioId);
+
     Optional<TipoConta> findByIdAndUsuarioId(Long id, String usuarioId);
 
     boolean existsByNomeAndUsuarioIdAndAtivoTrue(String nome, String usuarioId);
 
-    boolean existsByUsuarioId(String usuarioId);
+    void deleteByUsuarioId(String usuarioId);
 }
